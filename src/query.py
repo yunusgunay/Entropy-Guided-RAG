@@ -1,14 +1,19 @@
 # src/query.py
 """
-L1: Who was the man behind The Chipmunks?
-Entropy H_norm = 0.986 → adaptive k=8
-Entropy OFF: path=L1   | k=8 | retr=13.20 ms | TTFT gain=89.71% | acc=1 | L2 not checked
-Entropy ON: path=L1   | k=8 | retr=9.11 ms | TTFT gain=89.71% | acc=1 | L2 not checked
+L1: What star sign is Jamie Lee Curtis?
+Entropy H_norm = 0.867 -> adaptive k=4
+Entropy OFF: path=L1   | k=8 | retr=11.78 ms | TTFT gain=89.61% | acc=0 | L2 not checked
+Entropy ON: path=L1   | k=4 | retr=11.27 ms | TTFT gain=80.49% | acc=0 | L2 not checked
 
-L2: Which person created the Chipmunks?
-Entropy H_norm = 0.973 → adaptive k=8
-Entropy OFF: path=L2   | k=8 | retr=13.43 ms | TTFT gain=54.04% | acc=1 | L2 HIT (sim=0.969, skip_tokens=174)
-Entropy ON: path=L2   | k=8 | retr=9.02 ms | TTFT gain=54.04% | acc=1 | L2 HIT (sim=0.969, skip_tokens=174)
+L2: Which person created the Chipmunks? 
+Entropy H_norm = 0.973 -> adaptive k=8
+Entropy OFF: path=L2   | k=8 | retr=12.74 ms | TTFT gain=54.04% | acc=1 | L2 HIT (sim=0.969, skip_tokens=174)
+Entropy ON: path=L2   | k=8 | retr=8.61 ms | TTFT gain=54.04% | acc=1 | L2 HIT (sim=0.969, skip_tokens=174)
+
+NONE: What is the capital city of Turkiye?
+Entropy H_norm = 0.981 -> adaptive k=8
+Entropy OFF: path=NONE | k=8 | retr=13.38 ms | TTFT gain=0.00% | acc=NA | L2 MISS (reason=low_sim, sim=0.31198039650917053)
+Entropy ON: path=NONE | k=8 | retr=8.73 ms | TTFT gain=0.00% | acc=NA | L2 MISS (reason=low_sim, sim=0.2984195649623871)
 """
 import os, json, time, pickle
 import numpy as np
@@ -182,7 +187,7 @@ while True:
     tmp_s, _ = index.search(q_emb, TOP_K_MAX)
     Hn_info = compute_entropy_norm(tmp_s[0], tau=TAU, higher_is_better=True)
     k_info = adaptive_k(Hn_info)
-    print(f"\nEntropy H_norm = {Hn_info:.3f} → adaptive k={k_info}")
+    print(f"\nEntropy H_norm = {Hn_info:.3f} -> adaptive k={k_info}")
 
     off = run_world(q, use_entropy=False, kv=kv_off, l2=l2_off)
     on = run_world(q, use_entropy=True,  kv=kv_on,  l2=l2_on)
