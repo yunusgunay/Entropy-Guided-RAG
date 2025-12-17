@@ -29,7 +29,7 @@ MODEL_NAME = "all-MiniLM-L6-v2"
 TOP_K_MAX = 8
 TAU = 0.1
 FUZZY_THRESHOLD = 80
-L2_SIM_TH = 0.83
+L2_SIM_TH = 0.90
 L2_REUSE_RATIO = 0.6
 
 def percent_gain(base, final):

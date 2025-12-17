@@ -41,7 +41,7 @@ def compute_entropy_norm(scores: np.ndarray, tau: float = 0.1, higher_is_better:
 
 def adaptive_k(H_norm: float,
                thr: Tuple[float, float, float] = (0.880, 0.929, 0.963),
-               ks: Tuple[int, int, int, int] = (3, 5, 7, 8)) -> int:
+               ks: Tuple[int, int, int, int] = (4, 5, 7, 8)) -> int:
     # Thresholds derived from "src/calibrate_entropy.py" quantiles
     t1, t2, t3 = thr
     if H_norm <= t1: return ks[0]
