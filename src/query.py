@@ -1,4 +1,15 @@
 # src/query.py
+"""
+L1: Who was the man behind The Chipmunks?
+Entropy H_norm = 0.986 → adaptive k=8
+Entropy OFF: path=L1   | k=8 | retr=13.20 ms | TTFT gain=89.71% | acc=1 | L2 not checked
+Entropy ON: path=L1   | k=8 | retr=9.11 ms | TTFT gain=89.71% | acc=1 | L2 not checked
+
+L2: Which person created the Chipmunks?
+Entropy H_norm = 0.973 → adaptive k=8
+Entropy OFF: path=L2   | k=8 | retr=13.43 ms | TTFT gain=54.04% | acc=1 | L2 HIT (sim=0.969, skip_tokens=174)
+Entropy ON: path=L2   | k=8 | retr=9.02 ms | TTFT gain=54.04% | acc=1 | L2 HIT (sim=0.969, skip_tokens=174)
+"""
 import os, json, time, pickle
 import numpy as np
 from tqdm import tqdm
@@ -9,9 +20,8 @@ from simulator import (compute_entropy_norm, adaptive_k, approx_tokens, KVCacheS
 
 # Configurations
 INDEX_PATH = "data/processed/embeddings.faiss"
-META_PATH  = "data/processed/metadata.pkl"
-DATA_PATH  = "data/processed/triviaqa_clean.jsonl"
-
+META_PATH = "data/processed/metadata.pkl"
+DATA_PATH = "data/processed/triviaqa_clean.jsonl"
 CACHE_FILE = "data/cache/cache_state.pkl"
 
 BOOTSTRAP_N = 10
@@ -19,8 +29,6 @@ MODEL_NAME = "all-MiniLM-L6-v2"
 TOP_K_MAX = 8
 TAU = 0.1
 FUZZY_THRESHOLD = 80
-
-# L2 knobs
 L2_SIM_TH = 0.83
 L2_REUSE_RATIO = 0.6
 
@@ -48,7 +56,7 @@ def bootstrap_caches(model, index, passages, data):
         scores = scores[0]
         ids = ids[0]
 
-        # Entropy for IP/cosine: higher is better
+        # Entropy for IP/cosine: higher_is_better = True
         Hn = compute_entropy_norm(scores, tau=TAU, higher_is_better=True)
         k = adaptive_k(Hn)
 
@@ -169,7 +177,7 @@ while True:
     if not q or q.lower() in ("exit", "quit", ":q"):
         break
 
-    # show entropy for info
+    # Show entropy for info
     q_emb = model.encode([q], convert_to_numpy=True, normalize_embeddings=True).astype("float32")
     tmp_s, _ = index.search(q_emb, TOP_K_MAX)
     Hn_info = compute_entropy_norm(tmp_s[0], tau=TAU, higher_is_better=True)

@@ -1,8 +1,14 @@
 # src/build_index.py
+"""
+Output:
+Loaded 89,363 passages. Computing embeddings...
+Saved FAISS index to: data/processed/embeddings.faiss
+Saved metadata to: data/processed/metadata.pkl
+Index dim=384, vectors=89,363
+"""
 import json
 import pickle
 from tqdm import tqdm
-import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
 
@@ -80,13 +86,13 @@ def main():
 
     meta = {
         "texts": texts,
-        "passages": texts, # alias for older scripts
+        "passages": texts, # Alias for older scripts
         "question_ids": question_ids,
         "questions": questions,
         "answers": answers,
         "ranks": ranks,
         "urls": urls,
-        "doc_ids_str": doc_id_strs, # Do NOT use these as L1 keys.
+        "doc_ids_str": doc_id_strs, # Do NOT use these as L1 keys
         "model_name": MODEL_NAME,
         "use_cosine": USE_COSINE,
         "faiss_dim": dim,

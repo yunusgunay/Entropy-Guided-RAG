@@ -40,9 +40,9 @@ def compute_entropy_norm(scores: np.ndarray, tau: float = 0.1, higher_is_better:
     return H_norm
 
 def adaptive_k(H_norm: float,
-               thr: Tuple[float, float, float] = (0.780, 0.851, 0.926),
+               thr: Tuple[float, float, float] = (0.880, 0.929, 0.963),
                ks: Tuple[int, int, int, int] = (3, 5, 7, 8)) -> int:
-    # Thresholds derived from 'src/calibrate_entropy.py' quantiles
+    # Thresholds derived from "src/calibrate_entropy.py" quantiles
     t1, t2, t3 = thr
     if H_norm <= t1: return ks[0]
     if H_norm <= t2: return ks[1]
@@ -140,17 +140,20 @@ class Layer2KVAdapter:
         self.model = model
         self.sim_th = float(sim_threshold)
         self.reuse_ratio = float(reuse_ratio)
-        self.protos: List[np.ndarray] = [] # normalized vectors
+        self.protos: List[np.ndarray] = [] # Normalized vectors
         self.accepts = 0
         self.rejects = 0
     
     def _encode_norm(self, docs_text: List[str]) -> np.ndarray:
-        text = " ".join(docs_text)
-        return self.model.encode(
-            [text],
+        # Encode each document separately
+        embs = self.model.encode(
+            docs_text,
             convert_to_numpy=True,
             normalize_embeddings=True
-        ).astype("float32")[0]
+        ).astype("float32")
+        v = embs.mean(axis=0)
+        v = v / (np.linalg.norm(v) + 1e-12)
+        return v
     
     def try_reuse(self, docs_text: List[str], token_sizes: List[int]) -> Tuple[bool, Dict[str, Any]]:
         if not self.protos:
@@ -184,4 +187,3 @@ class Layer2KVAdapter:
             "reuse_ratio": self.reuse_ratio,
             "sim_threshold": self.sim_th,
         }
-

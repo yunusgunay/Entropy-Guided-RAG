@@ -1,4 +1,11 @@
 # src/preprocess.py
+"""
+Output:
+Total Raw Records: 11313
+Saved Valid Records: 11260
+Skipped (Empty/Invalid): 53
+Output File: data/processed/triviaqa_clean.jsonl
+"""
 import json
 import os
 from tqdm import tqdm
@@ -7,7 +14,7 @@ from tqdm import tqdm
 RAW_PATH = "data/raw/triviaqa_raw.json"
 OUT_PATH = "data/processed/triviaqa_clean.jsonl"
 
-MAX_DOCS_PER_Q = 5
+MAX_DOCS_PER_Q = 8
 
 def load_raw():
     if not os.path.exists(RAW_PATH):
@@ -56,7 +63,6 @@ def flatten_record(item):
             "url": url
         })
 
-    # 4. Limit to top 5 documents (Efficiency for RAG)
     docs = docs[:MAX_DOCS_PER_Q]
     qid = clean_text(item.get("QuestionId", ""))
 
@@ -67,7 +73,7 @@ def flatten_record(item):
         "id": qid,
         "question": q,
         "answer": ans,
-        "docs": docs  # List of dicts
+        "docs": docs # List of dicts
     }
 
 def process_all():
